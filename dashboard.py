@@ -11,7 +11,7 @@ from pricing_engine.greeks import compute_greeks
 
 st.set_page_config(page_title="Moteur de Pricing", layout="wide")
 st.title("Moteur de Pricing d'Options Européennes")
-
+ 
 # --- Sidebar : inputs utilisateur ---
 st.sidebar.header("Paramètres")
 S = st.sidebar.slider("Prix du sous-jacent (S)", 50, 200, 100)
