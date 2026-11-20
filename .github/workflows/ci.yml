@@ -26,11 +26,11 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          flake8 pricing_engine/ python/ tests/ --max-line-length=120
+          flake8 pricing_engine/ tests/ --max-line-length=120
 
       - name: Format check with black
         run: |
-          black --check pricing_engine/ python/ tests/
+          black --check pricing_engine/ tests/
 
       - name: Run tests with pytest
         run: |
