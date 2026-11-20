@@ -26,3 +26,4 @@ def test_volatility_surface_base():
     maturities = np.array([1.0])
     vol = volatility_surface(S=100, r=0.05, sigma_base=0.2, strikes=strikes, maturities=maturities)
     assert abs(vol[0, 0] - 0.2) < 1e-9
+    

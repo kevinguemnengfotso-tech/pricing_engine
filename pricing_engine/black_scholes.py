@@ -24,3 +24,4 @@ def black_scholes(S: float, K: float, r: float, sigma: float, T: float,
         return S * np.exp(-q * T) * norm.cdf(d1_val) - K * np.exp(-r * T) * norm.cdf(d2_val)
     else:
         return K * np.exp(-r * T) * norm.cdf(-d2_val) - S * np.exp(-q * T) * norm.cdf(-d1_val)
+    

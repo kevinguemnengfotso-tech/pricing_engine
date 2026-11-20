@@ -1,6 +1,5 @@
 """Tests for the Monte Carlo pricing module."""
 
-import numpy as np
 from pricing_engine.monte_carlo import monte_carlo, convergence_analysis
 from pricing_engine.black_scholes import black_scholes
 

@@ -6,3 +6,6 @@ __pycache__/
 .DS_Store
 Dockerfile
 docker-compose.yml
+.dockerignore
+plan_0.md
+methodologie.md

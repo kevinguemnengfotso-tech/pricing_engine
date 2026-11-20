@@ -1,6 +1,5 @@
 """Tests for the Greeks module."""
 
-import numpy as np
 from pricing_engine.greeks import compute_greeks
 
 
@@ -43,3 +42,4 @@ def test_delta_finite_diff():
     fd = (black_scholes(S+eps, K, r, sigma, T) - black_scholes(S-eps, K, r, sigma, T)) / (2*eps)
     g = compute_greeks(S, K, r, sigma, T)
     assert abs(g['delta'] - fd) < 1e-4
+    
