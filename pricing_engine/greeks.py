@@ -53,3 +53,8 @@ def delta_hedge(S, K, r, sigma, T, q=0.0, is_call=True, n_options=1):
     # Coût du hedge = nombre d'actions × prix spot
     hedge_cost = shares_to_trade * S
     return {'delta': delta, 'shares_to_trade': shares_to_trade, 'hedge_cost': hedge_cost}
+
+
+
+
+#https://pricingengine0.streamlit.app/
