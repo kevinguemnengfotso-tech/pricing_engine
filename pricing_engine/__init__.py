@@ -1,5 +1,8 @@
-# pricing_engine/__init__.py
-"""Moteur de pricing d'options européennes."""
+"""European option pricing engine.
+
+Provides Black-Scholes pricing, Monte Carlo pricing, Greeks computation,
+Delta hedging, and volatility utilities.
+"""
 
 __version__ = "1.0.0"
 __author__ = "Kévin GUEMNENG FOTSO"

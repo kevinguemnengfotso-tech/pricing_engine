@@ -5,7 +5,7 @@ from volatility import implied_volatility, volatility_surface
 
 
 def test_implied_volatility_roundtrip():
-    # IV doit retrouver sigma à partir d'un prix BS
+    # IV should recover sigma from a BS price
     from pricing_engine.black_scholes import black_scholes
     S, K, r, T, sigma = 100, 105, 0.05, 1.0, 0.2
     price = black_scholes(S, K, r, sigma, T, is_call=True)
@@ -21,9 +21,8 @@ def test_volatility_surface_shape():
 
 
 def test_volatility_surface_base():
-    # Au strike ATM (K=S), le skew est nul → vol = sigma_base
+    # At ATM strike (K=S), the skew is zero -> vol = sigma_base
     strikes = np.array([100.0])
     maturities = np.array([1.0])
     vol = volatility_surface(S=100, r=0.05, sigma_base=0.2, strikes=strikes, maturities=maturities)
     assert abs(vol[0, 0] - 0.2) < 1e-9
-    
