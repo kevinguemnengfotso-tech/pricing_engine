@@ -3,7 +3,7 @@
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/kevinguemnengfotso-tech/pricing_engine/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinguemnengfotso-tech/pricing_engine/actions)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red.svg)](https://pricing-engine.streamlit.app)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red.svg)](https://pricingengine0.streamlit.app)
 
 > Moteur de pricing d'options européennes (call/put) : Black-Scholes, Monte Carlo avec réduction de variance, Greeks analytiques, volatilité (historique, implicite, surface 3D) et dashboard Streamlit. Projet de portfolio Master Finance.
 
