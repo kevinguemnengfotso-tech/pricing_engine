@@ -1,6 +1,6 @@
 # Rapport de validation — Moteur de pricing d'options européennes
 
-**Projet de portfolio** · Master Finance · Kévin Guemneng Fotso
+**Projet de portfolio** · ENSIIE · Kévin Guemneng Fotso
 
 ---
 
@@ -206,4 +206,4 @@ Les perspectives (Heston, sauts, CVA) sont naturelles pour un projet plus avanc�
 ---
 
 *Rapport de validation — Moteur de pricing d'options européennes (Python).*
-*Kévin Guemneng Fotso — Master Finance.*
+*Kévin Guemneng Fotso — ENSIIE.*
