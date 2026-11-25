@@ -84,7 +84,7 @@ docker-compose up --build
 streamlit run dashboard.py
 ```
 
-Le dashboard est également déployé sur **[Streamlit Cloud](https://pricing-engine.streamlit.app)**.
+Le dashboard est également déployé sur **[Streamlit Cloud](https://pricingengine0.streamlit.app)**.
 
 ### API Python
 
