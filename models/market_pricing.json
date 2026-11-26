@@ -1,0 +1,9 @@
+{
+  "source": "yfinance",
+  "as_of": "2026-11-26",
+  "spot": 716.7,
+  "strikes": 139,
+  "sanity_gap": -0.5534,
+  "ipv_breaches": 63,
+  "note": "Simplified IPV: realized-vol mark vs market mid. FairVA and full P&L attribution out of scope."
+}

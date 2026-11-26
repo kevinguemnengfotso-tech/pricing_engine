@@ -1,4 +1,4 @@
-"""Streamlit dashboard for the European option pricing engine."""
+"""Streamlit dashboard for European and American option pricing."""
 
 import streamlit as st
 import numpy as np
@@ -8,9 +8,10 @@ import plotly.graph_objects as go
 from pricing_engine.black_scholes import black_scholes
 from pricing_engine.monte_carlo import monte_carlo
 from pricing_engine.greeks import compute_greeks
+from pricing_engine.binomial import binomial_price
 
 st.set_page_config(page_title="Option Pricing Engine", layout="wide")
-st.title("European Option Pricing Engine")
+st.title("Option Pricing Engine — European & American")
 
 # --- Sidebar: user inputs ---
 st.sidebar.header("Parameters")
@@ -22,17 +23,23 @@ T = st.sidebar.slider("Maturity (T in years)", 0.1, 3.0, 1.0, step=0.1)
 q = st.sidebar.slider("Dividend yield (q)", 0.0, 0.10, 0.0, step=0.001)
 option_type = st.sidebar.selectbox("Option type", ["Call", "Put"])
 is_call = option_type == "Call"
+exercise = st.sidebar.selectbox("Exercise style", ["European", "American"])
+american = exercise == "American"
+n_steps = st.sidebar.slider("Binomial tree steps", 100, 2000, 500, step=100)
 n_sim = st.sidebar.slider("Monte Carlo simulations", 1000, 200000, 100000, step=1000)
 
 # --- Calculations ---
 price_bs = black_scholes(S, K, r, sigma, T, q, is_call)
 price_mc = monte_carlo(S, K, r, sigma, T, q, n_sim, is_call, antithetic=True)
 g = compute_greeks(S, K, r, sigma, T, q, is_call)
+price_tree = binomial_price(S, K, r, sigma, T, n_steps, is_call, american, q)
 
 # --- Price display ---
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 col1.metric("Black-Scholes price", f"{price_bs:.4f}")
 col2.metric("Monte Carlo price", f"{price_mc:.4f}", delta=f"{price_mc - price_bs:.4f}")
+col3.metric(f"CRR tree ({exercise})", f"{price_tree:.4f}",
+            delta=f"{price_tree - price_bs:.4f}")
 
 # --- Greeks ---
 st.subheader("Greeks")
@@ -72,6 +79,19 @@ fig2.add_vline(x=S, line_dash="dot", annotation_text="Current S")
 fig2.add_vline(x=K, line_dash="dot", annotation_text="Strike")
 fig2.update_layout(xaxis_title="Underlying price (S)", yaxis_title="Delta")
 st.plotly_chart(fig2, use_container_width=True)
+
+# --- Tree convergence ---
+st.subheader("CRR tree convergence to Black-Scholes (European)")
+steps_grid = [50, 100, 250, 500, 1000, 2000]
+tree_prices = [binomial_price(S, K, r, sigma, T, n, is_call, False, q)
+               for n in steps_grid]
+fig_tree = go.Figure()
+fig_tree.add_trace(go.Scatter(x=steps_grid, y=tree_prices,
+                              name="CRR tree", mode="lines+markers"))
+fig_tree.add_hline(y=price_bs, line_dash="dash",
+                   annotation_text="Black-Scholes")
+fig_tree.update_layout(xaxis_title="Number of steps", yaxis_title="Price")
+st.plotly_chart(fig_tree, use_container_width=True)
 
 # --- Hedging (Delta-neutral) ---
 st.subheader("Hedging (Delta-neutral)")
