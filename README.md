@@ -1,11 +1,11 @@
-# Moteur de Pricing d'Options Européennes
+# Moteur de Pricing d'Options Européennes et Américaines
 
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/kevinguemnengfotso-tech/pricing_engine/actions/workflows/ci.yml/badge.svg)](https://github.com/kevinguemnengfotso-tech/pricing_engine/actions)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red.svg)](https://pricingengine0.streamlit.app)
 
-> Moteur de pricing d'options européennes (call/put) : Black-Scholes, Monte Carlo avec réduction de variance, Greeks analytiques, volatilité (historique, implicite, surface 3D) et dashboard Streamlit. Projet de portfolio Master Finance.
+> Moteur de pricing d'options européennes et américaines (call/put) : Black-Scholes, Monte Carlo avec réduction de variance, Greeks analytiques, volatilité (historique, implicite, surface 3D) et dashboard Streamlit. Projet de portfolio Master Finance.
 
 ---
 
@@ -28,13 +28,15 @@
 Ce projet implémente, en Python pur, les briques fondamentales du pricing de dérivés :
 
 - **Black-Scholes** : solution analytique fermée pour les options européennes, avec dividendes continus (`q`).
+- **Arbre binomial CRR** : pricing des options **américaines** par induction arrière, avec exercice anticipé (et convergence vers Black-Scholes pour les européennes).
+- **Données de marché** : spot et chaîne d'options SPY via yfinance, courbe Treasury via FRED, IPV simplifiée contre le mid bid/ask.
 - **Monte Carlo** : simulation de chemins selon un Mouvement Brownien Géométrique, avec antithetic variates et analyse de convergence.
 - **Greeks** : sensibilités analytiques (Δ, Γ, Θ, ν, ρ), vérifiées par différences finies.
 - **Volatilité** : historique (Yahoo Finance), implicite (inversion par Newton-Raphson) et surface 3D avec skew.
 - **Hedging** : dimensionnement d'un portefeuille Delta-neutre.
 - **Dashboard Streamlit** : interface interactive pour explorer le pricing et les sensibilités en temps réel.
 
-Le code est modulaire, testé (18 tests) et intégré dans une pipeline CI/CD (GitHub Actions).
+Le code est modulaire, testé (20 tests) et intégré dans une pipeline CI/CD (GitHub Actions).
 
 ---
 
@@ -47,7 +49,7 @@ Le code est modulaire, testé (18 tests) et intégré dans une pipeline CI/CD (G
 | Delta (call, K=105) | **0.54** |
 | Gamma | **0.02** |
 | Vega | **39.67** |
-| Tests unitaires | **18** (100% de réussite) |
+| Tests unitaires | **20** (100% de réussite) |
 
 ---
 
@@ -115,10 +117,13 @@ pricing_engine/
 │   ├── __init__.py             # Exports publics
 │   ├── black_scholes.py        # d1, d2, pricing analytique
 │   ├── monte_carlo.py          # Simulation GBM, antithetic, convergence
-│   └── greeks.py               # Greeks + dimensionnement du hedge
+│   ├── greeks.py               # Greeks + dimensionnement du hedge
+│   ├── binomial.py             # Arbre CRR (européennes / américaines)
+│   ├── market_data.py          # Spot et chaîne SPY (yfinance)
+│   └── curve.py                # Courbe Treasury (FRED)
 ├── volatility.py               # Vol. historique, implicite, surface 3D
 ├── dashboard.py                # Interface Streamlit
-├── tests/                      # 18 tests unitaires (pytest)
+├── tests/                      # 20 tests unitaires (pytest)
 ├── reports/report.md           # Rapport de validation technique
 ├── .github/workflows/ci.yml    # Pipeline CI/CD
 ├── Dockerfile / docker-compose.yml
@@ -162,14 +167,14 @@ Sensibilités analytiques (Δ, Γ, Θ, ν, ρ), vérifiées par différences fin
 | Put-call parity | Écart < 1e-6 |
 | Greeks vs différences finies | Écart < 1e-4 |
 | Convergence Monte Carlo | Erreur ∝ 1/√N (conforme à la théorie) |
-| Tests unitaires | 18 / 18 passent |
+| Tests unitaires | 20 / 20 passent |
 
 ---
 
 ## Limites et perspectives
 
 **Limites assumées** (conscience des hypothèses du modèle) :
-- Volatilité constante (pas de smile/skew capturé par Black-Scholes).
+- Volatilité constante pour Black-Scholes (smile non modélisé) ; IPV simplifiée avec mark à vol réalisée.
 - Pas de sauts de prix (modèle GBM).
 - Pas de CVA, pas de volatilité stochastique (Heston), pas de produits exotiques.
 - Taux sans risque constant (pas de fetch FRED).
@@ -182,7 +187,7 @@ Sensibilités analytiques (Δ, Γ, Θ, ν, ρ), vérifiées par différences fin
 ## Tests
 
 ```bash
-pytest tests/ -v                              # 18 tests
+pytest tests/ -v                              # 20 tests
 flake8 pricing_engine/ tests/ --max-line-length=120
 black --check pricing_engine/ tests/ dashboard.py volatility.py
 ```
@@ -192,6 +197,7 @@ black --check pricing_engine/ tests/ dashboard.py volatility.py
 | `test_black_scholes.py` | 5 |
 | `test_monte_carlo.py` | 4 |
 | `test_greeks.py` | 6 |
+| `test_binomial.py` | 2 | Convergence CRR vs BS, american put ≥ european put |
 | `test_volatility.py` | 3 |
 
 ---
@@ -206,9 +212,9 @@ Pipeline GitHub Actions : lint (flake8) + tests (pytest), déclenchée sur `push
 
 | Domaine | Détail |
 |---|---|
-| **Finance quantitative** | Black-Scholes, Monte Carlo, Greeks, hedging, volatilité |
+| **Finance quantitative** | Black-Scholes, Monte Carlo, CRR (américaines), Greeks, courbe de taux, IPV, volatilité |
 | **Python** | Architecture modulaire, type hints, docstrings (Google style) |
-| **Tests & qualité** | 18 tests unitaires, validation numérique, CI/CD |
+| **Tests & qualité** | 20 tests unitaires, validation numérique, CI/CD |
 | **Data / viz** | Dashboard Streamlit, graphiques Plotly (surface 3D) |
 | **DevOps** | Docker, GitHub Actions |
 

@@ -1,4 +1,4 @@
-# Rapport de validation — Moteur de pricing d'options européennes
+# Rapport de validation — Moteur de pricing d'options européennes et américaines
 
 **Projet de portfolio** · ENSIIE · Kévin Guemneng Fotso
 
@@ -16,6 +16,7 @@ L'objectif n'est pas de rivaliser avec les outils industriels (Bloomberg, Murex)
 
 Construire un moteur qui :
 - price une option européenne par la formule fermée de Black-Scholes ;
+- price une option **américaine** par arbre binomial CRR avec exercice anticipé ;
 - price la même option par simulation Monte Carlo (GBM) avec réduction de variance ;
 - calcule les Greeks (Δ, Γ, Θ, ν, ρ) de manière analytique ;
 - propose un dashboard interactif (Streamlit) pour explorer les sensibilités ;
@@ -72,6 +73,14 @@ $$d_1 = \frac{\ln(S_0/K) + (r - q + \sigma^2/2)T}{\sigma\sqrt{T}}, \qquad d_2 = 
 **Hypothèses** : sous-jacent en Mouvement Brownien Géométrique, marché complet, pas de coûts de transaction, volatilité et taux constants, dividendes continus.
 
 **Limites connues** : volatilité constante (le smile de volatilité n'est pas capturé), pas de sauts, pas de risque de crédit.
+
+### 3.1bis Arbre binomial CRR (options américaines)
+
+Pour les options américaines, il n'existe pas de formule fermée. On construit un arbre où,
+à chaque pas, le prix monte d'un facteur `u = exp(σ√Δt)` ou descend de `d = 1/u`, avec
+probabilité risque-neutre `p = (exp((r−q)Δt) − d)/(u − d)`. Par induction arrière, on
+compare à chaque noeud la valeur de continuation et la valeur intrinsèque : c'est
+l'exercice anticipé. Quand `N → ∞`, le prix converge vers Black-Scholes pour une européenne.
 
 ### 3.2 Monte Carlo
 
@@ -157,9 +166,10 @@ Les valeurs sont cohérentes avec la théorie : Delta call ∈ [0,1], Delta put 
 | `test_black_scholes.py` | 5 | Prix call/put, ATM, T≈0, put-call parity |
 | `test_monte_carlo.py` | 4 | Convergence, antithetic, put, convergence analysis |
 | `test_greeks.py` | 6 | Keys, Delta call/put, Gamma, Vega, différences finies |
+| `test_binomial.py` | 2 | Convergence CRR vs BS, American put ≥ European put |
 | `test_volatility.py` | 3 | Implied vol roundtrip, forme de la surface, base |
 
-**Total : 18 tests, tous passent.** La couverture n'est pas mesurée (pas de `pytest-cov` configuré).
+**Total : 20 tests, tous passent.** La couverture n'est pas mesurée (pas de `pytest-cov` configuré).
 
 ---
 
@@ -167,7 +177,7 @@ Les valeurs sont cohérentes avec la théorie : Delta call ∈ [0,1], Delta put 
 
 ### Limites assumées
 
-1. **Volatilité constante** — Black-Scholes ne capture pas le smile/skew de volatilité.
+1. **Volatilité constante pour Black-Scholes** — le smile n'est pas modélisé ; l'IPV du notebook 01 utilise une vol réalisée comme mark et le mid de marché comme référence.
 2. **Pas de sauts** — le GBM ne modélise pas les crashs ou les annonces.
 3. **Marché complet** — hypothèse irréaliste pour certains risques.
 4. **Pas de CVA** — le risque de crédit de la contrepartie n'est pas pris en compte.
@@ -179,7 +189,7 @@ Les valeurs sont cohérentes avec la théorie : Delta call ∈ [0,1], Delta put 
 
 - Implémenter Heston (volatilité stochastique) et Merton (sauts).
 - Calibrer la surface de volatilité implicite sur les prix de marché.
-- Ajouter le CVA (Monte Carlo + modèle de défaut).
+- Ajouter le smile calibré, la courbe de taux complète et le CVA (Monte Carlo + modèle de défaut).
 - Étendre aux produits exotiques (barrières, asiatiques).
 - Optimiser le noyau de calcul en C++ (pybind11).
 
@@ -189,9 +199,9 @@ Les valeurs sont cohérentes avec la théorie : Delta call ∈ [0,1], Delta put 
 
 | Compétence | Où dans le projet |
 |---|---|
-| Finance quantitative | Black-Scholes, Monte Carlo, Greeks, hedging, volatilité |
+| Finance quantitative | Black-Scholes, Monte Carlo, CRR (américaines), Greeks, courbe de taux, IPV, volatilité |
 | Python | Architecture modulaire, type hints, docstrings Google style |
-| Tests & qualité | 18 tests unitaires, validation numérique, CI/CD |
+| Tests & qualité | 20 tests unitaires, validation numérique, CI/CD |
 | Data / visualisation | Dashboard Streamlit, graphiques Plotly (surface 3D) |
 | DevOps | Docker, GitHub Actions |
 
@@ -205,5 +215,5 @@ Les perspectives (Heston, sauts, CVA) sont naturelles pour un projet plus avanc�
 
 ---
 
-*Rapport de validation — Moteur de pricing d'options européennes (Python).*
+*Rapport de validation — Moteur de pricing d'options européennes et américaines (Python).*
 *Kévin Guemneng Fotso — ENSIIE.*
